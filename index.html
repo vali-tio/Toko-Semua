@@ -375,19 +375,11 @@ grid.className = gridClass;
       const actions = document.createElement('div'); actions.className='flex gap-2 mt-2';
       const addBtn = document.createElement('button'); addBtn.className='flex-1 py-2 rounded-lg btn-main text-gray-900 min-h-[44px]'; addBtn.textContent='Tambah'; addBtn.onclick = ()=>addToCart(item);
       const waBtn = document.createElement('a'); waBtn.className='flex-1 py-2 rounded-lg bg-green-500 text-white text-center min-h-[44px]'; waBtn.textContent='Order WA'; waBtn.href = `https://wa.me/${document.getElementById('waNumber').value.trim()}?text=${encodeURIComponent('Halo saya mau pesan '+item.nama)}`; waBtn.target='_blank';
-actions.appendChild(addBtn); actions.appendChild(waBtn);
-if(isAdmin && window.innerWidth < 640) {
-  // Di HP, admin: tombol edit & hapus di bawah
-  const adminActions = document.createElement('div');
-  adminActions.className = "flex gap-2 mt-2";
-  adminActions.appendChild(editBtn); adminActions.appendChild(delBtn);
-  card.appendChild(actions); card.appendChild(adminActions);
-} else if (isAdmin) {
-  // Desktop, admin: sejajar
-  actions.appendChild(editBtn); actions.appendChild(delBtn);
-  card.appendChild(actions);
+const grid = document.createElement('div');
+if (isAdmin) {
+  grid.className = 'flex flex-col gap-3';
 } else {
-  card.appendChild(actions);
+  grid.className = (view === 'grid') ? 'grid grid-products gap-3' : 'flex flex-col gap-3';
 }
       card.appendChild(actions); grid.appendChild(card);
     });

@@ -1,71 +1,102 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+<!DOCTYPE html><html lang="id"><head><meta name="x-poe-datastore-behavior" content="local_only"><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Panel Admin Toko - Final (All-in-One)</title>
-   <link rel="manifest" href="manifest.webmanifest">
+  <link rel="manifest" href="manifest.webmanifest">
+  <!-- Tailwind CDN dengan JIT -->
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    :root {
+      --border: #e5e7eb;
+      --text: #222;
+      --card: #f3f4f6;
+    }
     /* Tema pastel lembut */
     .theme-blue  { --main: #93c5fd; --main-600:#2563eb; }
     .theme-green { --main: #a7f3d0; --main-600:#059669; }
     .theme-purple{ --main: #e9d5ff; --main-600:#7c3aed; }
     .theme-cream { --main: #fde68a; --main-600:#d97706; }
-    .btn-main { background-color: var(--main); }
+    .btn-main { background-color: var(--main); min-height:44px; }
     .btn-main:hover { filter: brightness(0.95); }
     .ring-main:focus { outline: none; box-shadow: 0 0 0 4px rgba(0,0,0,0.05), 0 0 0 4px var(--main); }
     .backdrop { background: rgba(0,0,0,0.45); }
+    /* Footer fix */
+    #donateFooter {
+      position: fixed;
+      bottom: 0; left: 0;
+      width: 100%;
+      background: var(--main, #f3f4f6);
+      border-top: 1px solid #e5e7eb;
+      color: #222;
+      font-size: 0.95rem;
+      text-align: center;
+      padding: 12px 0;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      z-index: 999;
+      min-height: 48px;
+      transition: background 0.2s;
+    }
+    #donateFooter a {
+      color: #f97316;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    #donateFooter a:hover {
+      text-decoration: underline;
+    }
+    body {
+      padding-bottom: 65px; /* tinggi footer */
+      min-height: 100vh;
+    }
+    /* Custom file input */
+    .file-label {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background: var(--main, #e0e7ff);
+      color: #222;
+      border-radius: 0.75rem;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 0.98rem;
+      transition: background 0.2s;
+    }
+    .file-label:hover { background: var(--main-600, #2563eb); color: #fff; }
+    input[type="file"].hidden-input { display: none !important; }
+    /* Modal scroll fix */
+    .modal-content {
+      overscroll-behavior: contain;
+      padding-bottom: 2rem;
+    }
+    /* Small devices: grid adaptif */
+    @media (max-width: 640px) {
+      .grid-products { grid-template-columns: 1fr !important; }
+    }
+    @media (min-width: 641px) {
+      .grid-products { grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
+    }
   </style>
-</head>
-<body class="bg-gray-100 min-h-screen p-4 theme-blue">
+<script src="https://puc.poecdn.net/authenticated_preview_page/syncedState.bd4eeeb8e8e02052ee92.js"></script></head>
+<body class="bg-gray-100 theme-blue">
 
 <!-- GEAR ICON / ADMIN TOGGLE -->
-<button id="gearBtn" class="fixed top-4 right-4 bg-white p-3 rounded-full shadow-md">⚙️</button>
+<button id="gearBtn" class="fixed top-4 right-4 bg-white p-3 rounded-full shadow-md z-50" aria-label="Admin Panel">⚙️</button>
 
 <!-- Header (public) -->
 <header class="max-w-3xl mx-auto bg-white rounded-2xl shadow p-4 mb-4 flex items-center justify-between">
-  <div>
-    <h1 id="siteTitle" class="text-xl font-bold text-gray-800">Nama Toko</h1>
-    <p id="siteSubtitle" class="text-xs text-gray-500">Buka toko Anda — buat, preview, dan checkout</p>
-  </div>
   <div class="flex items-center gap-3">
-    <button id="openCartBtn" class="px-3 py-2 rounded-xl bg-green-500 text-white">Keranjang (<span id="cartCount">0</span>)</button>
-    <button id="showQRISBtn" class="px-3 py-2 rounded-xl bg-indigo-500 text-white">Lihat QRIS</button>
+    <img id="headerLogo" src="" alt="logo toko" class="h-10 w-10 object-contain rounded-lg hidden">
+    <div>
+      <h1 id="siteTitle" class="text-xl font-bold text-gray-800">Nama Toko</h1>
+      <p id="siteSubtitle" class="text-xs text-gray-500">Buka toko Anda — buat, preview, dan checkout</p>
+    </div>
+  </div>
+  <div class="flex items-center gap-2">
+    <button id="openCartBtn" class="px-3 py-2 rounded-xl bg-green-500 text-white min-h-[44px] text-base">Keranjang (<span id="cartCount">0</span>)</button>
+    <button id="showQRISBtn" class="px-3 py-2 rounded-xl bg-indigo-500 text-white min-h-[44px] text-base">Lihat QRIS</button>
   </div>
 </header>
-<footer id="donateFooter">
-  <span>Gratis untuk semua</span>
-  <a href="https://saweria.co/valitio" target="_blank" rel="noopener noreferrer">
-    💝 Dukung via Saweria
-  </a>
-</footer>
-
-<style>
-  #donateFooter {
-    position: fixed;
-    bottom: 0; left: 0;
-    width: 100%;
-    background: var(--card);
-    border-top: 1px solid var(--border);
-    color: var(--text);
-    font-size: 0.9rem;
-    text-align: center;
-    padding: 10px;
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    z-index: 999;
-  }
-  #donateFooter a {
-    color: #f97316;
-    font-weight: 600;
-    text-decoration: none;
-  }
-  #donateFooter a:hover {
-    text-decoration: underline;
-  }
-</style>
 
 <main class="max-w-3xl mx-auto grid md:grid-cols-2 gap-4">
   <!-- Katalog / Products -->
@@ -75,25 +106,26 @@
 
   <!-- Admin Panel (hidden by default) -->
   <aside id="adminPanel" class="bg-white rounded-2xl shadow p-4 hidden">
-    <h3 class="font-bold mb-2">Panel Admin</h3>
+    <h3 class="font-bold mb-3 text-lg">Panel Admin</h3>
     <div class="space-y-3">
       <div>
-        <label class="text-sm text-gray-600">Nama Toko</label>
-        <input id="namaToko" class="w-full p-2 border rounded-xl" />
+        <label for="namaToko" class="text-sm text-gray-600">Nama Toko</label>
+        <input id="namaToko" class="w-full p-2 border rounded-xl mt-1" aria-label="Nama Toko">
       </div>
       <div>
-        <label class="text-sm text-gray-600">Nomor WhatsApp</label>
-        <input id="waNumber" class="w-full p-2 border rounded-xl" placeholder="6281234..." />
+        <label for="waNumber" class="text-sm text-gray-600">Nomor WhatsApp</label>
+        <input id="waNumber" class="w-full p-2 border rounded-xl mt-1" placeholder="6281234..." aria-label="Nomor WhatsApp">
       </div>
       <div>
-        <label class="text-sm text-gray-600">Logo</label>
-        <input id="logoInput" type="file" accept="image/*" class="w-full p-2" />
+        <label class="text-sm text-gray-600">Logo</label><br>
+        <label for="logoInput" class="file-label mt-1">Pilih Logo</label>
+        <input id="logoInput" type="file" accept="image/*" class="hidden-input">
       </div>
 
       <div>
         <label class="text-sm text-gray-600">Tambah Kategori</label>
-        <div class="flex gap-2">
-          <input id="kategoriBaru" class="flex-1 p-2 border rounded-xl" placeholder="Contoh: Minuman" />
+        <div class="flex gap-2 mt-1">
+          <input id="kategoriBaru" class="flex-1 p-2 border rounded-xl" placeholder="Contoh: Minuman" aria-label="Tambah Kategori">
           <button id="btnTambahKategori" class="px-3 rounded-xl btn-main text-gray-900">+</button>
         </div>
         <select id="kategoriProduk" class="w-full mt-2 p-2 border rounded-xl"></select>
@@ -101,24 +133,27 @@
 
       <div>
         <label class="text-sm text-gray-600">Tambah / Edit Produk</label>
-        <input id="namaProduk" class="w-full p-2 border rounded-xl mt-1" placeholder="Nama produk (wajib)" />
-        <input id="hargaProduk" class="w-full p-2 border rounded-xl mt-1" placeholder="Harga (kosong => 0)" inputmode="numeric" />
-        <textarea id="deskripsiProduk" rows="2" class="w-full p-2 border rounded-xl mt-1" placeholder="Deskripsi (opsional)"></textarea>
-        <input id="fotoProduk" type="file" accept="image/*" class="w-full p-2 mt-1" />
+        <input id="namaProduk" class="w-full p-2 border rounded-xl mt-1" placeholder="Nama produk (wajib)" aria-label="Nama Produk">
+        <input id="hargaProduk" class="w-full p-2 border rounded-xl mt-1" placeholder="Harga (kosong =&gt; 0)" inputmode="numeric" aria-label="Harga Produk">
+        <textarea id="deskripsiProduk" rows="2" class="w-full p-2 border rounded-xl mt-1" placeholder="Deskripsi (opsional)" aria-label="Deskripsi Produk"></textarea>
+        <div class="mt-1 flex items-center gap-2">
+          <label for="fotoProduk" class="file-label">Pilih Foto Produk</label>
+          <input id="fotoProduk" type="file" accept="image/*" class="hidden-input">
+        </div>
         <button id="btnProduk" class="w-full mt-2 py-2 rounded-xl btn-main font-semibold text-gray-900">+ Tambah Produk</button>
       </div>
 
       <div class="grid grid-cols-2 gap-2">
         <div>
-          <label class="text-sm text-gray-600">Tampilan</label>
-          <select id="viewMode" class="w-full p-2 border rounded-xl">
+          <label for="viewMode" class="text-sm text-gray-600">Tampilan</label>
+          <select id="viewMode" class="w-full p-2 border rounded-xl mt-1">
             <option value="grid">Grid</option>
             <option value="list">List</option>
           </select>
         </div>
         <div>
-          <label class="text-sm text-gray-600">Tema</label>
-          <select id="themeColor" class="w-full p-2 border rounded-xl">
+          <label for="themeColor" class="text-sm text-gray-600">Tema</label>
+          <select id="themeColor" class="w-full p-2 border rounded-xl mt-1">
             <option value="blue">Biru</option>
             <option value="green">Hijau</option>
             <option value="purple">Ungu</option>
@@ -128,15 +163,16 @@
       </div>
 
       <div>
-        <label class="text-sm text-gray-600">Upload QRIS (gambar)</label>
-        <input id="qrisInput" type="file" accept="image/*" class="w-full p-2" />
+        <label class="text-sm text-gray-600">Upload QRIS (gambar)</label><br>
+        <label for="qrisInput" class="file-label mt-1">Pilih QRIS</label>
+        <input id="qrisInput" type="file" accept="image/*" class="hidden-input">
       </div>
 
       <div>
         <label class="text-sm text-gray-600">Ubah PIN</label>
-        <div class="grid grid-cols-2 gap-2">
-          <input id="oldPin" type="password" inputmode="numeric" maxlength="6" placeholder="PIN lama" class="p-2 border rounded-xl" />
-          <input id="newPin" type="password" inputmode="numeric" maxlength="6" placeholder="PIN baru" class="p-2 border rounded-xl" />
+        <div class="grid grid-cols-2 gap-2 mt-1">
+          <input id="oldPin" type="password" inputmode="numeric" maxlength="6" placeholder="PIN lama" class="p-2 border rounded-xl" aria-label="PIN lama">
+          <input id="newPin" type="password" inputmode="numeric" maxlength="6" placeholder="PIN baru" class="p-2 border rounded-xl" aria-label="PIN baru">
         </div>
         <button id="btnUbahPin" class="w-full mt-2 py-2 rounded-xl bg-amber-500 text-white">Ubah PIN</button>
       </div>
@@ -144,7 +180,7 @@
       <div class="grid grid-cols-2 gap-2">
         <button id="btnBackup" class="py-2 rounded-xl bg-sky-500 text-white">Backup JSON</button>
         <label for="importFile" class="py-2 rounded-xl bg-indigo-500 text-white text-center cursor-pointer">Import JSON</label>
-        <input id="importFile" type="file" accept="application/json" class="hidden" />
+        <input id="importFile" type="file" accept="application/json" class="hidden-input">
       </div>
 
       <div class="flex gap-2">
@@ -155,16 +191,23 @@
   </aside>
 </main>
 
+<footer id="donateFooter">
+  <span>Gratis untuk semua</span>
+  <a href="https://saweria.co/valitio" target="_blank" rel="noopener noreferrer">
+    💝 Dukung via Saweria
+  </a>
+</footer>
+
 <!-- Preview / Logo and QRIS hidden elements -->
-<img id="previewLogo" src="" alt="logo" class="hidden" />
-<img id="qrisPreview" src="" alt="qris" class="hidden" />
+<img id="previewLogo" src="" alt="logo" class="hidden">
+<img id="qrisPreview" src="" alt="qris" class="hidden">
 
 <!-- PIN Modal -->
 <div id="pinModal" class="fixed inset-0 hidden items-center justify-center backdrop z-50">
-  <div class="bg-white rounded-2xl p-6 w-[90vw] max-w-sm">
+  <div class="bg-white rounded-2xl p-6 w-[90vw] max-w-sm modal-content">
     <h3 id="pinModalTitle" class="font-bold text-lg mb-2">Masuk Admin</h3>
     <p id="pinModalSubtitle" class="text-xs text-gray-500 mb-3">Masukkan PIN untuk mengakses panel admin.</p>
-    <input id="pinInput" type="password" inputmode="numeric" maxlength="6" class="w-full p-3 border rounded-xl" placeholder="PIN" />
+    <input id="pinInput" type="password" inputmode="numeric" maxlength="6" class="w-full p-3 border rounded-xl" placeholder="PIN">
     <div class="flex gap-2 mt-3">
       <button id="pinOk" class="flex-1 py-2 rounded-xl btn-main text-gray-900">OK</button>
       <button id="pinCancel" class="flex-1 py-2 rounded-xl bg-gray-200">Batal</button>
@@ -174,7 +217,7 @@
 
 <!-- Cart Modal -->
 <div id="cartModal" class="fixed inset-0 hidden items-end md:items-center justify-center backdrop z-40">
-  <div class="bg-white w-full md:w-[28rem] rounded-t-2xl md:rounded-2xl p-4 shadow-xl max-h-[90vh] overflow-auto">
+  <div class="bg-white w-full md:w-[28rem] rounded-t-2xl md:rounded-2xl p-4 shadow-xl max-h-[90vh] overflow-auto modal-content">
     <div class="flex items-center justify-between mb-2">
       <h3 class="text-lg font-semibold">🛒 Keranjang</h3>
       <button id="closeCart" class="text-sm text-gray-500">Tutup</button>
@@ -185,37 +228,33 @@
       <span id="cartTotal" class="font-bold">Rp 0</span>
     </div>
     <div class="mt-3 grid grid-cols-2 gap-2">
-      <button id="btnCartToWA" class="bg-green-500 text-white py-2 rounded-xl">Order via WA</button>
-      <button id="btnShowQRISFromCart" class="bg-indigo-500 text-white py-2 rounded-xl">Lihat QRIS</button>
+      <button id="btnCartToWA" class="bg-green-500 text-white py-2 rounded-xl min-h-[44px]">Order via WA</button>
+      <button id="btnShowQRISFromCart" class="bg-indigo-500 text-white py-2 rounded-xl min-h-[44px]">Lihat QRIS</button>
     </div>
   </div>
 </div>
 
 <!-- QRIS Modal (checkout) -->
 <div id="qrisModal" class="fixed inset-0 hidden items-center justify-center backdrop z-50">
-  <div class="bg-white rounded-2xl p-4 w-[90vw] max-w-sm shadow-xl">
+  <div class="bg-white rounded-2xl p-4 w-[90vw] max-w-sm shadow-xl modal-content">
     <div class="flex items-center justify-between mb-2">
-      <h3 class="text-lg font-semibold">QRIS & Total</h3>
+      <h3 class="text-lg font-semibold">QRIS &amp; Total</h3>
       <button id="closeQRIS" class="text-sm text-gray-500">Tutup</button>
     </div>
     <div class="text-center">
-      <img id="qrisModalImg" src="" alt="qris" class="mx-auto w-56 h-56 object-contain rounded-lg border" />
+      <img id="qrisModalImg" src="" alt="qris" class="mx-auto w-56 h-56 object-contain rounded-lg border">
       <p class="mt-3 font-semibold">Total: <span id="qrisTotal">Rp 0</span></p>
     </div>
   </div>
 </div>
 
 <script>
-// ---------- Keys ----------
 const LSK = { DATA: 'toko:data', PIN: 'toko:pin', LOGGED: 'toko:logged' };
-
-// ---------- State ----------
 let produkList = [];
 let kategoriList = [];
 let editId = null;
 let cart = [];
 
-// ---------- Helpers ----------
 function formatRupiah(n){ const x = Number(n||0); return 'Rp ' + x.toLocaleString('id-ID'); }
 
 function saveAll(){
@@ -255,14 +294,20 @@ function loadAll(){
   }catch(e){ console.error('Load failed', e); }
 }
 
-function setLogoPreview(src){ const logo = document.getElementById('previewLogo'); logo.dataset.src = src; logo.src = src; logo.classList.remove('hidden'); document.getElementById('siteTitle').textContent = document.getElementById('namaToko').value || 'Nama Toko'; }
+function setLogoPreview(src){
+  const logo = document.getElementById('previewLogo');
+  logo.dataset.src = src; logo.src = src; logo.classList.remove('hidden');
+  // Tampilkan di header
+  const headerLogo = document.getElementById('headerLogo');
+  if(headerLogo){ headerLogo.src = src; headerLogo.classList.remove('hidden'); }
+  document.getElementById('siteTitle').textContent = document.getElementById('namaToko').value || 'Nama Toko';
+}
 function setQRISPreview(src){ const q = document.getElementById('qrisPreview'); q.dataset.src = src; q.src = src; }
 
 function applyTheme(){ const theme = document.getElementById('themeColor').value; document.body.classList.remove('theme-blue','theme-green','theme-purple','theme-cream'); document.body.classList.add('theme-'+theme); saveAll(); }
 
 function renderKategoriOptions(){ const sel = document.getElementById('kategoriProduk'); sel.innerHTML = '<option value="">-- Pilih Kategori (opsional) --</option>'; kategoriList.forEach(k=>{ const o=document.createElement('option'); o.value=k; o.textContent=k; sel.appendChild(o); }); }
 
-// ---------- Auth (PIN + Login) ----------
 function openPinModal(setupMode=false){
   document.getElementById('pinModal').classList.remove('hidden');
   document.getElementById('pinModalTitle').textContent = setupMode ? 'Buat PIN Baru' : 'Masuk Admin';
@@ -283,7 +328,6 @@ function hideAdmin(){ document.getElementById('adminPanel').classList.add('hidde
 
 function tryAutoShowAdmin(){ if(localStorage.getItem(LSK.LOGGED)) showAdmin(); else hideAdmin(); }
 
-// ---------- Produk CRUD & UI ----------
 function tambahKategori(){ const kat = document.getElementById('kategoriBaru').value.trim(); if(!kat) return; if(!kategoriList.includes(kat)) kategoriList.push(kat); document.getElementById('kategoriBaru').value=''; renderKategoriOptions(); saveAll(); }
 
 function handleAddOrEditProduk(){ const nama = document.getElementById('namaProduk').value.trim(); let harga = document.getElementById('hargaProduk').value.trim(); const desk = document.getElementById('deskripsiProduk').value.trim(); const kat = document.getElementById('kategoriProduk').value;
@@ -303,7 +347,9 @@ function hapusProduk(id){ if(!confirm('Hapus produk ini?')) return; produkList =
 
 function resetProdukForm(){ document.getElementById('namaProduk').value=''; document.getElementById('hargaProduk').value=''; document.getElementById('deskripsiProduk').value=''; document.getElementById('fotoProduk').value=''; document.getElementById('kategoriProduk').value=''; }
 
-function renderProducts(){ const container = document.getElementById('productsArea'); container.innerHTML=''; document.getElementById('siteTitle').textContent = document.getElementById('namaToko').value || 'Nama Toko';
+function renderProducts(){
+  const container = document.getElementById('productsArea'); container.innerHTML='';
+  document.getElementById('siteTitle').textContent = document.getElementById('namaToko').value || 'Nama Toko';
   const view = document.getElementById('viewMode').value;
   // group by category
   const groups = {};
@@ -311,95 +357,158 @@ function renderProducts(){ const container = document.getElementById('productsAr
   Object.keys(groups).forEach(kat=>{
     const section = document.createElement('div'); section.className='mb-4';
     const title = document.createElement('h3'); title.className='font-bold text-gray-700 mb-2'; title.textContent = kat; section.appendChild(title);
-    const grid = document.createElement('div'); grid.className = (view==='grid') ? 'grid grid-cols-2 gap-3' : 'flex flex-col gap-3';
+    // Grid adaptif
+const isAdmin = document.getElementById('adminPanel').classList.contains('hidden') === false;
+let gridClass = '';
+if (isAdmin && window.innerWidth < 640) {
+  gridClass = 'flex flex-col gap-3'; // admin mode di HP: list
+} else {
+  gridClass = (view === 'grid') ? 'grid grid-products gap-3' : 'flex flex-col gap-3';
+}
+const grid = document.createElement('div');
+grid.className = gridClass;
     groups[kat].forEach(item=>{
       const card = document.createElement('div'); card.className='border rounded-xl p-3 bg-white shadow flex flex-col';
       if(item.foto){ const img = document.createElement('img'); img.src = item.foto; img.className='w-full h-36 object-cover rounded-lg mb-2'; card.appendChild(img); }
-      const info = document.createElement('div'); info.innerHTML = `<p class="font-semibold">${item.nama}</p><p class="text-sm text-gray-500">${formatRupiah(item.harga)}</p><p class="text-xs text-gray-400">${item.deskripsi||''}</p>`;
+      const info = document.createElement('div'); info.innerHTML = `<p class="font-semibold text-base">${item.nama}</p><p class="text-sm text-gray-500">${formatRupiah(item.harga)}</p><p class="text-xs text-gray-400">${item.deskripsi||''}</p>`;
       card.appendChild(info);
       const actions = document.createElement('div'); actions.className='flex gap-2 mt-2';
-      const addBtn = document.createElement('button'); addBtn.className='flex-1 py-2 rounded-lg btn-main text-gray-900'; addBtn.textContent='Tambah'; addBtn.onclick = ()=>addToCart(item);
-      const waBtn = document.createElement('a'); waBtn.className='flex-1 py-2 rounded-lg bg-green-500 text-white text-center'; waBtn.textContent='Order WA'; waBtn.href = `https://wa.me/${document.getElementById('waNumber').value.trim()}?text=${encodeURIComponent('Halo saya mau pesan '+item.nama)}`; waBtn.target='_blank';
-      actions.appendChild(addBtn); actions.appendChild(waBtn);
-      // if admin is visible, show edit/hapus small buttons
-      if(document.getElementById('adminPanel').classList.contains('hidden')===false){ const editBtn=document.createElement('button'); editBtn.className='px-2 py-1 bg-yellow-500 text-white rounded'; editBtn.textContent='Edit'; editBtn.onclick=()=>editProduk(item.id); const delBtn=document.createElement('button'); delBtn.className='px-2 py-1 bg-red-500 text-white rounded'; delBtn.textContent='Hapus'; delBtn.onclick=()=>hapusProduk(item.id); actions.appendChild(editBtn); actions.appendChild(delBtn); }
+      const addBtn = document.createElement('button'); addBtn.className='flex-1 py-2 rounded-lg btn-main text-gray-900 min-h-[44px]'; addBtn.textContent='Tambah'; addBtn.onclick = ()=>addToCart(item);
+      const waBtn = document.createElement('a'); waBtn.className='flex-1 py-2 rounded-lg bg-green-500 text-white text-center min-h-[44px]'; waBtn.textContent='Order WA'; waBtn.href = `https://wa.me/${document.getElementById('waNumber').value.trim()}?text=${encodeURIComponent('Halo saya mau pesan '+item.nama)}`; waBtn.target='_blank';
+actions.appendChild(addBtn); actions.appendChild(waBtn);
+if(isAdmin && window.innerWidth < 640) {
+  // Di HP, admin: tombol edit & hapus di bawah
+  const adminActions = document.createElement('div');
+  adminActions.className = "flex gap-2 mt-2";
+  adminActions.appendChild(editBtn); adminActions.appendChild(delBtn);
+  card.appendChild(actions); card.appendChild(adminActions);
+} else if (isAdmin) {
+  // Desktop, admin: sejajar
+  actions.appendChild(editBtn); actions.appendChild(delBtn);
+  card.appendChild(actions);
+} else {
+  card.appendChild(actions);
+}
       card.appendChild(actions); grid.appendChild(card);
     });
     section.appendChild(grid); container.appendChild(section);
   });
 }
 
-// ---------- Cart ----------
-function addToCart(item){ const ex = cart.find(c=>c.id===item.id); if(ex) ex.qty++; else cart.push({ id:item.id, nama:item.nama, harga:Number(item.harga), qty:1 }); updateCartBadge(); renderCart(); }
+function addToCart(item){
+  const ex = cart.find(c=>c.id===item.id); if(ex) ex.qty++; else cart.push({ id:item.id, nama:item.nama, harga:Number(item.harga), qty:1 }); updateCartBadge(); renderCart();
+}
 function removeFromCart(id){ cart = cart.filter(c=>c.id!==id); updateCartBadge(); renderCart(); }
 function changeQty(id,delta){ const it = cart.find(c=>c.id===id); if(!it) return; it.qty += delta; if(it.qty<=0) removeFromCart(id); updateCartBadge(); renderCart(); }
 function cartTotal(){ return cart.reduce((s,c)=> s + c.harga*c.qty, 0); }
 function updateCartBadge(){ const n = cart.reduce((s,c)=> s+c.qty, 0); document.getElementById('cartCount').textContent = n; }
-function renderCart(){ const wrap = document.getElementById('cartItems'); wrap.innerHTML=''; cart.forEach(c=>{ const row = document.createElement('div'); row.className='flex items-center justify-between border rounded-xl p-2'; const left = document.createElement('div'); left.innerHTML=`<p class="font-semibold text-sm">${c.nama}</p><p class="text-xs text-gray-500">${formatRupiah(c.harga)}</p>`; const qty = document.createElement('div'); qty.className='flex items-center gap-2'; const btnMinus=document.createElement('button'); btnMinus.className='px-2 py-1 bg-gray-200 rounded'; btnMinus.textContent='-'; btnMinus.onclick=()=>changeQty(c.id,-1); const span=document.createElement('span'); span.textContent=c.qty; const btnPlus=document.createElement('button'); btnPlus.className='px-2 py-1 bg-gray-200 rounded'; btnPlus.textContent='+'; btnPlus.onclick=()=>changeQty(c.id,1); const del=document.createElement('button'); del.className='ml-2 px-2 py-1 bg-red-500 text-white rounded'; del.textContent='Hapus'; del.onclick=()=>removeFromCart(c.id); qty.appendChild(btnMinus); qty.appendChild(span); qty.appendChild(btnPlus); qty.appendChild(del); row.appendChild(left); row.appendChild(qty); wrap.appendChild(row); }); document.getElementById('cartTotal').textContent = formatRupiah(cartTotal()); }
+function renderCart(){
+  const wrap = document.getElementById('cartItems'); wrap.innerHTML='';
+  cart.forEach(c=>{
+    const row = document.createElement('div'); row.className='flex items-center justify-between border rounded-xl p-2';
+    const left = document.createElement('div'); left.innerHTML=`<p class="font-semibold text-sm">${c.nama}</p><p class="text-xs text-gray-500">${formatRupiah(c.harga)}</p>`;
+    const qty = document.createElement('div'); qty.className='flex items-center gap-2';
+    const btnMinus=document.createElement('button'); btnMinus.className='px-2 py-1 bg-gray-200 rounded'; btnMinus.textContent='-'; btnMinus.onclick=()=>changeQty(c.id,-1);
+    const span=document.createElement('span'); span.textContent=c.qty;
+    const btnPlus=document.createElement('button'); btnPlus.className='px-2 py-1 bg-gray-200 rounded'; btnPlus.textContent='+'; btnPlus.onclick=()=>changeQty(c.id,1);
+    const del=document.createElement('button'); del.className='ml-2 px-2 py-1 bg-red-500 text-white rounded'; del.textContent='Hapus'; del.onclick=()=>removeFromCart(c.id);
+    qty.appendChild(btnMinus); qty.appendChild(span); qty.appendChild(btnPlus); qty.appendChild(del);
+    row.appendChild(left); row.appendChild(qty); wrap.appendChild(row);
+  });
+  document.getElementById('cartTotal').textContent = formatRupiah(cartTotal());
+}
 
 function openCart(){ renderCart(); document.getElementById('cartModal').classList.remove('hidden'); }
 function closeCart(){ document.getElementById('cartModal').classList.add('hidden'); }
 
-function orderCartViaWA(){ const wa = document.getElementById('waNumber').value.trim(); if(!wa) return alert('Nomor WA belum diisi.'); if(cart.length===0) return alert('Keranjang kosong.'); const lines = cart.map(c=> `- ${c.nama} x${c.qty} = ${formatRupiah(c.harga*c.qty)}`).join('%0A'); const total = formatRupiah(cartTotal()); const text = `Halo, saya mau pesan:%0A${lines}%0A%0ATotal: ${total}`; const url = `https://wa.me/${wa}?text=${text}`; window.open(url,'_blank'); }
+function orderCartViaWA(){
+  const wa = document.getElementById('waNumber').value.trim(); if(!wa) return alert('Nomor WA belum diisi.'); if(cart.length===0) return alert('Keranjang kosong.');
+  const lines = cart.map(c=> `- ${c.nama} x${c.qty} = ${formatRupiah(c.harga*c.qty)}`).join('%0A'); const total = formatRupiah(cartTotal());
+  const text = `Halo, saya mau pesan:%0A${lines}%0A%0ATotal: ${total}`; const url = `https://wa.me/${wa}?text=${text}`; window.open(url,'_blank');
+}
 
-function openQRISFromCart(){ const src = document.getElementById('qrisPreview').dataset.src; if(!src) return alert('QRIS belum diupload.'); document.getElementById('qrisModalImg').src = src; document.getElementById('qrisTotal').textContent = formatRupiah(cartTotal()); document.getElementById('qrisModal').classList.remove('hidden'); }
+function openQRISFromCart(){
+  const src = document.getElementById('qrisPreview').dataset.src; if(!src) return alert('QRIS belum diupload.');
+  document.getElementById('qrisModalImg').src = src; document.getElementById('qrisTotal').textContent = formatRupiah(cartTotal()); document.getElementById('qrisModal').classList.remove('hidden');
+}
 
-// ---------- QRIS + Logo Upload ----------
-function handleLogoUpload(e){ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=ev=>{ setLogoPreview(ev.target.result); saveAll(); renderProducts(); }; r.readAsDataURL(f); }
-function handleQRISUpload(e){ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=ev=>{ setQRISPreview(ev.target.result); saveAll(); }; r.readAsDataURL(f); }
+function handleLogoUpload(e){
+  const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=ev=>{ setLogoPreview(ev.target.result); saveAll(); renderProducts(); }; r.readAsDataURL(f);
+}
+function handleQRISUpload(e){
+  const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=ev=>{ setQRISPreview(ev.target.result); saveAll(); }; r.readAsDataURL(f);
+}
 
-// ---------- Backup / Import / Reset ----------
-function doBackup(){ saveAll(); const raw = localStorage.getItem(LSK.DATA) || '{}'; const blob = new Blob([raw],{type:'application/json'}); const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='toko-backup.json'; a.click(); URL.revokeObjectURL(url); }
-function doImport(file){ const r=new FileReader(); r.onload=e=>{ try{ const data = JSON.parse(e.target.result); localStorage.setItem(LSK.DATA, JSON.stringify(data)); loadAll(); alert('Import berhasil.'); }catch(err){ alert('File tidak valid.'); } }; r.readAsText(file); }
-function doReset(){ if(!confirm('Reset semua data? Tindakan ini tidak bisa dibatalkan.')) return; localStorage.removeItem(LSK.DATA); localStorage.removeItem(LSK.PIN); localStorage.removeItem(LSK.LOGGED); produkList=[]; kategoriList=[]; cart=[]; document.getElementById('previewLogo').dataset.src=''; document.getElementById('qrisPreview').dataset.src=''; document.getElementById('previewLogo').src=''; document.getElementById('qrisPreview').src=''; renderKategoriOptions(); renderProducts(); applyTheme(); updateCartBadge(); alert('Data telah direset.'); }
+function doBackup(){
+  saveAll(); const raw = localStorage.getItem(LSK.DATA) || '{}'; const blob = new Blob([raw],{type:'application/json'}); const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='toko-backup.json'; a.click(); URL.revokeObjectURL(url);
+}
+function doImport(file){
+  const r=new FileReader(); r.onload=e=>{ try{ const data = JSON.parse(e.target.result); localStorage.setItem(LSK.DATA, JSON.stringify(data)); loadAll(); alert('Import berhasil.'); }catch(err){ alert('File tidak valid.'); } }; r.readAsText(file);
+}
+function doReset(){
+  if(!confirm('Reset semua data? Tindakan ini tidak bisa dibatalkan.')) return;
+  localStorage.removeItem(LSK.DATA); localStorage.removeItem(LSK.PIN); localStorage.removeItem(LSK.LOGGED);
+  produkList=[]; kategoriList=[]; cart=[]; document.getElementById('previewLogo').dataset.src=''; document.getElementById('qrisPreview').dataset.src=''; document.getElementById('previewLogo').src=''; document.getElementById('qrisPreview').src='';
+  renderKategoriOptions(); renderProducts(); applyTheme(); updateCartBadge(); alert('Data telah direset.');
+}
 
-// ---------- PIN change ----------
-function changePIN(){ const oldp = document.getElementById('oldPin').value.trim(); const newp = document.getElementById('newPin').value.trim(); const cur = localStorage.getItem(LSK.PIN) || ''; if(!oldp || !newp) return alert('Isi PIN lama dan PIN baru.'); if(oldp !== cur) return alert('PIN lama salah.'); if(!/^[0-9]{4,6}$/.test(newp)) return alert('PIN baru 4-6 digit angka.'); localStorage.setItem(LSK.PIN,newp); document.getElementById('oldPin').value=''; document.getElementById('newPin').value=''; alert('PIN berhasil diubah.'); }
+function changePIN(){
+  const oldp = document.getElementById('oldPin').value.trim(); const newp = document.getElementById('newPin').value.trim();
+  const cur = localStorage.getItem(LSK.PIN) || '';
+  if(!oldp || !newp) return alert('Isi PIN lama dan PIN baru.');
+  if(oldp !== cur) return alert('PIN lama salah.');
+  if(!/^[0-9]{4,6}$/.test(newp)) return alert('PIN baru 4-6 digit angka.');
+  localStorage.setItem(LSK.PIN,newp); document.getElementById('oldPin').value=''; document.getElementById('newPin').value=''; alert('PIN berhasil diubah.');
+}
 
-// ---------- Events ----------
 window.addEventListener('DOMContentLoaded', ()=>{
-  // load
   loadAll();
   tryAutoShowAdmin();
 
-  // Gear button opens PIN modal (if no PIN set -> prompt create)
   document.getElementById('gearBtn').addEventListener('click', ()=>{ const cur = localStorage.getItem(LSK.PIN); openPinModal(!cur); });
-
-  // admin actions
   document.getElementById('btnTambahKategori').addEventListener('click', tambahKategori);
   document.getElementById('btnProduk').addEventListener('click', handleAddOrEditProduk);
+
+  // Custom label trigger file input
+  document.querySelector('label[for="logoInput"]').onclick = ()=>document.getElementById('logoInput').click();
   document.getElementById('logoInput').addEventListener('change', handleLogoUpload);
+  document.querySelector('label[for="qrisInput"]').onclick = ()=>document.getElementById('qrisInput').click();
   document.getElementById('qrisInput').addEventListener('change', handleQRISUpload);
+
+  // Custom label import
+  document.querySelector('label[for="importFile"]').onclick = ()=>document.getElementById('importFile').click();
+  document.getElementById('importFile').addEventListener('change', (e)=>{ const f=e.target.files[0]; if(f) doImport(f); e.target.value=''; });
+
   document.getElementById('btnUbahPin').addEventListener('click', changePIN);
   document.getElementById('btnBackup').addEventListener('click', doBackup);
-  document.getElementById('importFile').addEventListener('change', (e)=>{ const f=e.target.files[0]; if(f) doImport(f); e.target.value=''; });
   document.getElementById('btnReset').addEventListener('click', doReset);
   document.getElementById('btnLogout').addEventListener('click', ()=>{ logoutAdmin(); });
 
-  // preview inputs save
   document.getElementById('namaToko').addEventListener('input', ()=>{ document.getElementById('siteTitle').textContent = document.getElementById('namaToko').value || 'Nama Toko'; saveAll(); });
   document.getElementById('waNumber').addEventListener('input', ()=> saveAll());
   document.getElementById('themeColor').addEventListener('change', applyTheme);
   document.getElementById('viewMode').addEventListener('change', ()=>{ renderProducts(); saveAll(); });
 
-  // cart & qris
   document.getElementById('openCartBtn').addEventListener('click', ()=>{ openCart(); });
   document.getElementById('closeCart').addEventListener('click', closeCart);
   document.getElementById('btnCartToWA').addEventListener('click', orderCartViaWA);
   document.getElementById('btnShowQRISFromCart').addEventListener('click', openQRISFromCart);
-  document.getElementById('showQRISBtn').addEventListener('click', ()=>{ const src = document.getElementById('qrisPreview').dataset.src; if(!src) return alert('QRIS belum diupload.'); document.getElementById('qrisModalImg').src = src; document.getElementById('qrisTotal').textContent = formatRupiah(cartTotal()); document.getElementById('qrisModal').classList.remove('hidden'); });
+  document.getElementById('showQRISBtn').addEventListener('click', ()=>{
+    const src = document.getElementById('qrisPreview').dataset.src; if(!src) return alert('QRIS belum diupload.');
+    document.getElementById('qrisModalImg').src = src;
+    document.getElementById('qrisTotal').textContent = formatRupiah(cartTotal());
+    document.getElementById('qrisModal').classList.remove('hidden');
+  });
   document.getElementById('closeQRIS').addEventListener('click', ()=> document.getElementById('qrisModal').classList.add('hidden'));
-
-  // pin modal cancel
   document.getElementById('pinCancel').addEventListener('click', ()=> document.getElementById('pinModal').classList.add('hidden'));
-
-  // pin modal overlay OK handled inside openPinModal
 });
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("service-worker.js")
-        .then(() => console.log("Service Worker registered"))
-        .catch(err => console.error("SW registration failed:", err));
-    }
-  </script>
-</body>
-</html>
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("service-worker.js")
+    .then(() => console.log("Service Worker registered"))
+    .catch(err => console.error("SW registration failed:", err));
+}
+</script>
+
+
+</body></html>
